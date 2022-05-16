@@ -17,11 +17,13 @@ import com.bootcamp.credit.consumption.dto.CreditConsumptionByIdCreditRequest;
 import com.bootcamp.credit.consumption.dto.CreditConsumptionByIdRequest;
 import com.bootcamp.credit.consumption.entity.CreditConsumption;
 import com.bootcamp.credit.consumption.service.impl.CreditConsumptionServiceImpl;
+import com.bootcamp.credit.consumption.service.impl.CreditLineServiceImpl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/CreditConsumption")

@@ -1,10 +1,15 @@
 package com.bootcamp.credit.consumption.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.bootcamp.credit.consumption.entity.CreditConsumption;
+import com.bootcamp.credit.consumption.entity.CreditLine;
+import com.bootcamp.credit.consumption.property.Constantes;
 import com.bootcamp.credit.consumption.repository.CreditConsumptionRepository;
+import com.bootcamp.credit.consumption.repository.CreditLineRepository;
 import com.bootcamp.credit.consumption.service.impl.CreditConsumptionServiceImpl;
+import com.bootcamp.credit.consumption.service.impl.CreditLineServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +21,10 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CreditConsumptionService implements CreditConsumptionServiceImpl{
 	private  final CreditConsumptionRepository creditConsumptionRepository;
-
+	private final CreditLineService creditLineService;
+    
+	private RestTemplate restTemplate;
+	
     @Override
     public Flux<CreditConsumption> getAllCreditConsumption() {
         return creditConsumptionRepository.findAll();
@@ -29,13 +37,26 @@ public class CreditConsumptionService implements CreditConsumptionServiceImpl{
 
     @Override
     public Mono<CreditConsumption> createCreditConsumption(CreditConsumption credit) {
+
     	if(credit !=null) {
-    		log.error("INICIO_CREACION_CREDIT");
-    		log.info("documentNumber: "+credit.getIdCredit());
-    		return creditConsumptionRepository.save(credit);
+    		log.info(Constantes.SEPARADOR);
+    		log.info(Constantes.INICIO + Constantes.ACT1_CREAR_CREDIT_CONSUMPTION);
+    		log.info(Constantes.CREDIT_ID + credit.getIdCredit());
+			log.info(Constantes.SEPARADOR);
+			return creditLineService.getCreditLineByIdCredit(credit.getIdCredit())
+				   .flatMap(object ->{
+					       if(object.getAmountLine() >= credit.getAmountTrx()) {
+					    	   return creditConsumptionRepository.save(credit);
+					       }
+						Mono<? extends CreditConsumption> a = null;
+						return a;	   
+				   });
+    		/* return creditConsumptionRepository.save(credit); */
     	}else {
-    		log.error("Credit is null");
-    		throw new RuntimeException("Credit is null");
+    		log.info(Constantes.SEPARADOR);
+    		log.info(Constantes.ERROR);
+    		log.info(Constantes.SEPARADOR);
+    		throw new RuntimeException(Constantes.EXCEPTIONEMPTYNULL);
     	}
        
     }
@@ -64,7 +85,7 @@ public class CreditConsumptionService implements CreditConsumptionServiceImpl{
 
 	@Override
 	public Flux<CreditConsumption> getCreditConsumptionByIdCredit(String idCredit) {
-		log.error("INICIO_CREDIT_CONSUMTION");
+		log.info("INICIO_CREDIT_CONSUMTION");
 		log.info("idCredit: "+idCredit);
 		return creditConsumptionRepository.findByIdCredit(idCredit);
 	}
