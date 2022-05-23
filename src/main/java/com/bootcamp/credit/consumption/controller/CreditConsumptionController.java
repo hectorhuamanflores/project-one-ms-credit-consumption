@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bootcamp.credit.consumption.dto.CreditConsumptionByIdCreditRequest;
 import com.bootcamp.credit.consumption.dto.CreditConsumptionByIdRequest;
 import com.bootcamp.credit.consumption.entity.CreditConsumption;
-import com.bootcamp.credit.consumption.service.impl.CreditConsumptionServiceImpl;
-import com.bootcamp.credit.consumption.service.impl.CreditLineServiceImpl;
+import com.bootcamp.credit.consumption.service.CreditConsumptionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,14 +28,15 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/CreditConsumption")
 public class CreditConsumptionController {
 
-	private final CreditConsumptionServiceImpl creditConsumptionService;
+	private final CreditConsumptionService creditConsumptionService;
 
     @GetMapping
     public Mono<ResponseEntity<Flux<CreditConsumption>>>getAllCreditConsumption() {
         Flux<CreditConsumption> list=this.creditConsumptionService.getAllCreditConsumption();
         return  Mono.just(ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(list));
+                .body(list))
+        		.defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/idCreditConsumption")
